@@ -1,0 +1,13 @@
+.gradle
+
+build
+target
+trash
+node_modules
+dist
+.idea
+
+*.log
+*~
+\#*#
+.$*.drawio.bkp

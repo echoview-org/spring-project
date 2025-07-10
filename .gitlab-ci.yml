@@ -1,0 +1,9 @@
+deploy:
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  cache:
+      paths:
+        - .m2/repository
+  image: gitlab.echoview.org:5050/builder/mvn3.9.9-jdk21:latest
+  script:
+    - 'mvn deploy -s ci-settings.xml'
