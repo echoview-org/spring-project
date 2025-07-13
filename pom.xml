@@ -30,7 +30,7 @@
     <!--
         <spring-data-jpa.version>3.3.0</spring-data-jpa.version>
     -->
-    <springframework.version>6.1.13</springframework.version>
+    <springframework.version>6.2.8</springframework.version>
 
     <guava.version>33.1.0-jre</guava.version>
     <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
