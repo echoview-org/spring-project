@@ -6,7 +6,7 @@
 
   <groupId>org.echoview</groupId>
   <artifactId>spring-project</artifactId>
-  <version>1.0</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
 
   <name>Basic Spring sample parent pom</name>
@@ -689,7 +689,7 @@
     <repository>
       <id>github</id>
       <name>Spring Project</name>
-      <url>https://maven.pkg.github.com/echoview-org/spring-project</url>
+      <url>https://maven.pkg.github.com/echoview2/spring-project</url>
     </repository>
   </distributionManagement>
 </project>
