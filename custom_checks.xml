@@ -255,7 +255,7 @@
       <property name="braceAdjustment" value="2"/>
       <property name="caseIndent" value="2"/>
       <property name="throwsIndent" value="4"/>
-      <!-- Emacs の indent に合わせるために 4から2へ変更 -->
+      <!-- Changed from 4 to 2 to match Emacs indentation settings -->
       <property name="lineWrappingIndentation" value="2"/>
       <property name="arrayInitIndent" value="2"/>
     </module>
