@@ -6,3 +6,9 @@ updates:
     schedule:
       # バージョンアップスケジュール
       interval: daily
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      # バージョンアップスケジュール
+      interval: daily
