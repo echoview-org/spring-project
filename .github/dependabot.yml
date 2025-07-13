@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # github-actions のときは, 例外的に /(スラッシュ)を指定
+    directory: /
+    schedule:
+      # バージョンアップスケジュール
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      # バージョンアップスケジュール
+      interval: daily
