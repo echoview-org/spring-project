@@ -43,7 +43,7 @@
     <modelmapper.version>3.2.0</modelmapper.version>
     <org.slf4j.version>2.0.13</org.slf4j.version>
     <reactor-test.version>3.6.6</reactor-test.version>
-    <spotbugs-annotations.version>4.8.5</spotbugs-annotations.version>
+    <spotbugs-annotations.version>4.9.3</spotbugs-annotations.version>
     <spotbugs-maven-plugin.version>4.8.4.0</spotbugs-maven-plugin.version>
     <wildfly-maven-plugin.version>5.0.0.Final</wildfly-maven-plugin.version>
   </properties>
