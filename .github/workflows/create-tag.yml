@@ -79,7 +79,7 @@ jobs:
             echo "Please update pom.xml version first"
             exit 1
           fi
-        echo "✅ Version consistency verified"
+          echo "✅ Version consistency verified"
 
       - name: Run POM validation
         run: |
