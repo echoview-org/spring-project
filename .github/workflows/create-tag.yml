@@ -17,121 +17,121 @@ jobs:
   validate-and-tag:
     runs-on: ubuntu-latest
     steps:
-    # git rev-parse, git branch --show-current, git tag コマンドで履歴が必要になるので
-    # fetch-depth : 0 を指定する。
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: 'maven'
-    - name: Validate inputs
-      run: |
-        VERSION="${{ github.event.inputs.version }}"
+      - uses: actions/checkout@v4
+        with:
+          # git rev-parse, git branch --show-current, git tag コマンドで履歴が必要になるので
+          # fetch-depth : 0 を指定する。
+          fetch-depth: 0
 
-        # バージョン形式チェック
-        if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "❌ ERROR: Version must follow semantic versioning (x.y.z)"
-          exit 1
-        fi
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
 
-        echo "✅ Version format valid: $VERSION"
+      - name: Validate inputs
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
 
-    - name: Check if on main branch
-      run: |
-        CURRENT_BRANCH=$(git branch --show-current)
-        if [[ "$CURRENT_BRANCH" != "main" ]]; then
-          echo "❌ ERROR: Must be on main branch, currently on: $CURRENT_BRANCH"
-          exit 1
-        fi
-        echo "✅ On main branch"
-
-    - name: Check if tag already exists
-      run: |
-        VERSION="${{ github.event.inputs.version }}"
-        TAG="v$VERSION"
-        FORCE="${{ github.event.inputs.force }}"
-
-        if git rev-parse "$TAG" >/dev/null 2>&1; then
-          if [[ "$FORCE" != "true" ]]; then
-            echo "❌ ERROR: Tag $TAG already exists. Use force option to overwrite."
+          # バージョン形式チェック
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ ERROR: Version must follow semantic versioning (x.y.z)"
             exit 1
-          else
-            echo "⚠️  WARNING: Tag $TAG exists but force option enabled"
           fi
-        else
-          echo "✅ Tag $TAG does not exist"
-        fi
+          echo "✅ Version format valid: $VERSION"
 
-    - name: Validate POM version matches
-      run: |
-        VERSION="${{ github.event.inputs.version }}"
-        POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+      - name: Check if on main branch
+        run: |
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [[ "$CURRENT_BRANCH" != "main" ]]; then
+            echo "❌ ERROR: Must be on main branch, currently on: $CURRENT_BRANCH"
+            exit 1
+          fi
+          echo "✅ On main branch"
 
-        echo "Requested version: $VERSION"
-        echo "POM version: $POM_VERSION"
+      - name: Check if tag already exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          TAG="v$VERSION"
+          FORCE="${{ github.event.inputs.force }}"
 
-        if [[ "$VERSION" != "$POM_VERSION" ]]; then
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            if [[ "$FORCE" != "true" ]]; then
+              echo "❌ ERROR: Tag $TAG already exists. Use force option to overwrite."
+              exit 1
+            else
+              echo "⚠️  WARNING: Tag $TAG exists but force option enabled"
+            fi
+          else
+            echo "✅ Tag $TAG does not exist"
+          fi
+
+      - name: Validate POM version matches
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+          echo "Requested version: $VERSION"
+          echo "POM version: $POM_VERSION"
+
+          if [[ "$VERSION" != "$POM_VERSION" ]]; then
           echo "❌ ERROR: Requested version ($VERSION) does not match POM version ($POM_VERSION)"
-          echo "Please update pom.xml version first"
-          exit 1
-        fi
-
+            echo "Please update pom.xml version first"
+            exit 1
+          fi
         echo "✅ Version consistency verified"
 
-    - name: Run POM validation
-      run: |
-        echo "🔍 Running Maven validation..."
-        mvn -B validate
+      - name: Run POM validation
+        run: |
+          echo "🔍 Running Maven validation..."
+          mvn -B validate
+          echo "🔍 Running dependency analysis..."
+          mvn -B dependency:analyze
 
-        echo "🔍 Running dependency analysis..."
-        mvn -B dependency:analyze
+      - name: Run BOM validation
+        run: |
+          echo "🔍 Running BOM-specific validation..."
 
-    - name: Run BOM validation
-      run: |
-        echo "🔍 Running BOM-specific validation..."
+          # BOM構造チェック
+          PACKAGING=$(mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout)
+          if [[ "$PACKAGING" != "pom" ]]; then
+            echo "❌ ERROR: BOM must have packaging type 'pom', found: $PACKAGING"
+            exit 1
+          fi
+          echo "✅ BOM validation passed"
 
-        # BOM構造チェック
-        PACKAGING=$(mvn help:evaluate -Dexpression=project.packaging -q -DforceStdout)
-        if [[ "$PACKAGING" != "pom" ]]; then
-          echo "❌ ERROR: BOM must have packaging type 'pom', found: $PACKAGING"
-          exit 1
-        fi
+      - name: Check for version conflicts
+        run: |
+          echo "🔍 Checking for dependency conflicts..."
+          CONFLICTS=$(mvn dependency:tree -B 2>/dev/null | grep -E "\[WARNING\].*version conflict" || true)
+          if [[ -n "$CONFLICTS" ]]; then
+            echo "❌ ERROR: Version conflicts detected:"
+            echo "$CONFLICTS"
+            exit 1
+          fi
+          echo "✅ No version conflicts found"
 
-        echo "✅ BOM validation passed"
+      - name: Create and push tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          TAG="v$VERSION"
+          FORCE="${{ github.event.inputs.force }}"
 
-    - name: Check for version conflicts
-      run: |
-        echo "🔍 Checking for dependency conflicts..."
-        CONFLICTS=$(mvn dependency:tree -B 2>/dev/null | grep -E "\[WARNING\].*version conflict" || true)
-        if [[ -n "$CONFLICTS" ]]; then
-          echo "❌ ERROR: Version conflicts detected:"
-          echo "$CONFLICTS"
-          exit 1
-        fi
-        echo "✅ No version conflicts found"
+          # Git設定
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Create and push tag
-      run: |
-        VERSION="${{ github.event.inputs.version }}"
-        TAG="v$VERSION"
-        FORCE="${{ github.event.inputs.force }}"
+          # タグ作成
+          if [[ "$FORCE" == "true" ]]; then
+            git tag -a "$TAG" -m "Release version $VERSION" --force
+            git push origin "$TAG" --force
+            echo "🏷️ Force created and pushed tag: $TAG"
+          else
+            git tag -a "$TAG" -m "Release version $VERSION"
+            git push origin "$TAG"
+            echo "🏷️ Created and pushed tag: $TAG"
+          fi
 
-        # Git設定
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-
-        # タグ作成
-        if [[ "$FORCE" == "true" ]]; then
-          git tag -a "$TAG" -m "Release version $VERSION" --force
-          git push origin "$TAG" --force
-          echo "🏷️ Force created and pushed tag: $TAG"
-        else
-          git tag -a "$TAG" -m "Release version $VERSION"
-          git push origin "$TAG"
-          echo "🏷️ Created and pushed tag: $TAG"
-        fi
-
-        echo "✅ Tag creation completed successfully"
+          echo "✅ Tag creation completed successfully"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
