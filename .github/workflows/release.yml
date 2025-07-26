@@ -9,7 +9,8 @@ jobs:
     env:
       VERSION: ${{ github.ref_name }}
     permissions:
-      contents: read
+      contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -17,19 +18,15 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-      - run: |
-          echo "GITHUB_BASE_REF=$GITHUB_BASE_REF"
-          echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
-          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
-          echo "GITHUB_SHA=$GITHUB_SHA"
-          git branch -r --contains $GITHUB_SHA
-          mvn -B dependency:resolve
-          mvn -B -Dcheckstyle.skip=true validate
-          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout=true)
-          if [[ "v${POM_VERSION}" != "$VERSION" ]]; then
-            echo "version mismatched. pom version=v${POM_VERSION}, tag=$VERSION"
-          fi
-          exit 1
-
+      - name: deploy
+        run: |
+          mvn -B deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: relase
+        run: |
+          gh release create "${VERSION}" --generate-notes pom.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
