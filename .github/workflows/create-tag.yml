@@ -117,10 +117,6 @@ jobs:
           TAG="v$VERSION"
           FORCE="${{ github.event.inputs.force }}"
 
-          # Git設定
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
           # タグ作成
           if [[ "$FORCE" == "true" ]]; then
             git tag -a "$TAG" -m "Release version $VERSION" --force
