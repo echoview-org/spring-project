@@ -689,7 +689,7 @@
     <repository>
       <id>github</id>
       <name>Spring Project</name>
-      <url>https://maven.pkg.github.com/echoview2/spring-project</url>
+      <url>https://maven.pkg.github.com/echoview-org/spring-project</url>
     </repository>
   </distributionManagement>
 </project>
