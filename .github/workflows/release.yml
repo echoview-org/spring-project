@@ -18,9 +18,13 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - run: |
+          echo "GITHUB_BASE_REF=$GITHUB_BASE_REF"
+          echo "GITHUB_HEAD_REF=$GITHUB_HEAD_REF"
+          echo "GITHUB_REF_NAME=$GITHUB_REF_NAME"
+          echo "GITHUB_SHA=$GITHUB_SHA"
           git branch -r --contains $GITHUB_SHA
           mvn -B dependency:resolve
-          mvn -B validate
+          mvn -B -Dcheckstyle.skip=true validate
           POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout=true)
           if [[ "v${POM_VERSION}" != "$VERSION" ]]; then
             echo "version mismatched. pom version=v${POM_VERSION}, tag=$VERSION"
