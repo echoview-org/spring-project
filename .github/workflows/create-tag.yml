@@ -1,4 +1,4 @@
-name: create tag
+name: Tag and push
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
         type: boolean
 
 jobs:
-  validate-and-tag:
+  tag-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -149,7 +149,7 @@ jobs:
             -d '{
               "event_type": "tag-pushed",
               "client_payload": {
-                "tag_name": "v${{ github.event.inputs.version }}",
+                "tag_name": "v${{ github.event.inputs.version }}"
               }
           }')
 

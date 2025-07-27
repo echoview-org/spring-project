@@ -1,9 +1,9 @@
-name: release
+name: Deploy to package & release
 on:
   repository_dispatch:
     types: [tag-pushed]
 jobs:
-  release:
+  deply-and-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
