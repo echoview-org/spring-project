@@ -149,7 +149,7 @@ jobs:
             -d '{
               "event_type": "tag-pushed",
               "client_payload": {
-                "tag_name: "v${{ github.event.inputs.version }}",
+                "tag_name": "v${{ github.event.inputs.version }}",
               }
           }')
 
