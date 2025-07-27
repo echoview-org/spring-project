@@ -54,7 +54,7 @@ jobs:
 
       - name: Check if tag already exists
         run: |
-          TAG="v$${{ github.event.inputs.version }}"
+          TAG="v${{ github.event.inputs.version }}"
           FORCE="${{ github.event.inputs.force }}"
 
           if git rev-parse "$TAG" >/dev/null 2>&1; then
