@@ -8,10 +8,12 @@ jobs:
     permissions:
       contents: write
       packages: write
+    env:
+      TAG_NAME : ${{ github.event.client_payload.tag_name }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.client_payload.tag_name }}
+          ref: ${{ env.TAG_NAME }}
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
@@ -24,7 +26,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: relase
         run: |
-          gh release create "${VERSION}" --generate-notes pom.xml
+          gh release create "$TAG_NAME" --generate-notes pom.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
