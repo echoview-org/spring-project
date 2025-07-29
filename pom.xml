@@ -32,7 +32,7 @@
     -->
     <springframework.version>6.2.9</springframework.version>
 
-    <guava.version>33.1.0-jre</guava.version>
+    <guava.version>33.4.8-jre</guava.version>
     <hibernate-validator.version>9.0.1.Final</hibernate-validator.version>
     <jackson.version>2.19.1</jackson.version>
     <jakarta.el.version>4.0.2</jakarta.el.version>
